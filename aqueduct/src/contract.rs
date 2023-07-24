@@ -1107,6 +1107,7 @@ impl Aqueduct {
             }
             if cur_milestone > 0 { time += stream.segments[(cur_milestone - 1) as usize].milestone; }
             time += stream.segments[cur_milestone as usize].period * cur_period;
+            let mut prev_milestone = 0;
             while time < system_api::current_system_time().micros() && cur_milestone < stream.segments.len() as u64 {
                 let mut endtime = time + stream.segments[cur_milestone as usize].period;
                 if endtime > stream.segments[cur_milestone as usize].milestone {
@@ -1124,7 +1125,11 @@ impl Aqueduct {
                     if let Ok((log, _)) = self.call_application(true, Self::logger_id()?, &call, vec![]).await {
                         for log_statement in log {
                             if let Ok(Operation::Income { amount, keyword }) = serde_json::from_str::<Operation>(&log_statement.log) {
-                                amount_to_give.saturating_add_assign(amount);
+                                let cons: f64 = (stream.segments[cur_milestone as usize].constant as f64 ) / 1000000000000000000.;
+                                let fact: f64 = (stream.segments[cur_milestone as usize].factor as f64 ) / 1000000000000000000.;
+                                let expo: f64 = (stream.segments[cur_milestone as usize].exponent as f64 ) / 1000000000000000000.;
+                                let var1=(((time - prev_milestone) as f64) / ((stream.segments[cur_milestone as usize].milestone - prev_milestone) as f64));
+                                amount_to_give.saturating_add_assign(amount.saturating_mul((cons + fact * var1.powf(expo)) as u128));
                             }
                         }
                     }
@@ -1132,6 +1137,7 @@ impl Aqueduct {
                 time = endtime;
                 cur_period += 1;
                 if time == stream.segments[cur_milestone as usize].milestone {
+                    prev_milestone = stream.segments[cur_milestone as usize].milestone;
                     cur_milestone += 1;
                     cur_period = 0;
                 }
