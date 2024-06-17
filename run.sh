@@ -9,6 +9,7 @@ cd ../linera-protocol/scripts/
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 CONF_DIR="${SCRIPT_DIR}/../configuration"
 
+#change dr
 cd $SCRIPT_DIR/..
 
 # For debug builds:
