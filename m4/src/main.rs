@@ -5,6 +5,7 @@ use std::str::FromStr;
 use std::collections::{BTreeMap, BTreeSet};
 use proc_macro2::*;
 use rustfmt_wrapper::rustfmt;
+use rustfmt_wrapper::rustfmt;
 
 const PATH: &str = "../aqueduct/src";
 const ERRORS: &str = "
